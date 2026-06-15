@@ -1,0 +1,26 @@
+{
+  "name": "Ponto Fly",
+  "short_name": "Ponto Fly",
+  "description": "A tua loja de fios e acessórios para tricot e croché.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4A3866",
+  "orientation": "portrait-primary",
+  "lang": "pt",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/logo.jpeg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any"
+    }
+  ]
+}
