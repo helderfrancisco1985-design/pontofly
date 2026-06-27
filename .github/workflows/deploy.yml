@@ -64,8 +64,9 @@ jobs:
           server:   ${{ secrets.CPANEL_FTP_HOST }}
           username: ${{ secrets.CPANEL_FTP_USER }}
           password: ${{ secrets.CPANEL_FTP_PASSWORD }}
-          local-dir:  ./deploy/
-          server-dir: /pontofly/
-          protocol: ftps        # explicit FTPS (STARTTLS) — muda para "ftp" se o servidor não suportar TLS
           port: 21
-          dangerous-clean-slate: false   # nunca apaga ficheiros que não existam localmente (preserva .env, node_modules)
+          protocol: ftps        # Explicit FTPS (AUTH TLS) — trocar por "ftp" se o cPanel não suportar TLS
+          security: loose       # cPanel pode usar cert que não bate com o hostname; loose evita erro SSL
+          local-dir: ./deploy/
+          server-dir: /pontofly/ # FTP root = /home/pontofl1/ → /pontofly/ = Application Root
+          dangerous-clean-slate: false
