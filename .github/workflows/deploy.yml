@@ -1,4 +1,4 @@
-name: Deploy to cPanel
+name: Deploy to cPanel via FTP
 
 on:
   push:
@@ -22,41 +22,32 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # NEXT_PUBLIC_* vars are baked into the bundle at build time — must be secrets here
+      # NEXT_PUBLIC_* vars are baked into the client bundle at build time
       - name: Build
         run: npm run build
         env:
           NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN: ${{ secrets.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN }}
           NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN: ${{ secrets.NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN }}
 
-      - name: Upload build artifacts to cPanel via SCP
-        uses: appleboy/scp-action@v0.1.7
+      - name: Assemble deploy folder
+        run: |
+          mkdir -p deploy
+          cp -r .next     deploy/
+          cp -r public    deploy/
+          cp package.json      deploy/
+          cp package-lock.json deploy/
+          cp server.js         deploy/
+          [ -f next.config.ts ] && cp next.config.ts deploy/
+          [ -f next.config.js ] && cp next.config.js deploy/
+
+      - name: Deploy via FTPS
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          host: ${{ secrets.CPANEL_HOST }}
-          username: ${{ secrets.CPANEL_USER }}
-          # password auth — swap for key/key_passphrase if using SSH key
-          password: ${{ secrets.CPANEL_PASSWORD }}
-          port: 22
-          source: ".next,public,package.json,package-lock.json,server.js,next.config.ts"
-          target: ${{ secrets.CPANEL_TARGET_DIR }}
-
-      - name: Install prod deps, fix permissions, restart app
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.CPANEL_HOST }}
-          username: ${{ secrets.CPANEL_USER }}
-          password: ${{ secrets.CPANEL_PASSWORD }}
-          port: 22
-          script: |
-            set -e
-            cd "${{ secrets.CPANEL_TARGET_DIR }}"
-
-            # Install only production deps (no build, just package extraction)
-            npm ci --omit=dev
-
-            # Fix permissions: dirs 755, files 644 — skip node_modules for speed
-            find . -not -path './node_modules/*' -type d -exec chmod 755 {} \;
-            find . -not -path './node_modules/*' -type f -exec chmod 644 {} \;
-
-            # Tell Passenger to restart on next request
-            mkdir -p tmp && touch tmp/restart.txt
+          server:   ${{ secrets.CPANEL_FTP_HOST }}
+          username: ${{ secrets.CPANEL_FTP_USER }}
+          password: ${{ secrets.CPANEL_FTP_PASSWORD }}
+          local-dir:  ./deploy/
+          server-dir: /pontofly/
+          protocol: ftps        # explicit FTPS (STARTTLS) — muda para "ftp" se o servidor não suportar TLS
+          port: 21
+          dangerous-clean-slate: false   # nunca apaga ficheiros que não existam localmente (preserva .env, node_modules)
