@@ -148,7 +148,7 @@ export default function ContactForm() {
         <button
           type="submit"
           className="mt-2 flex w-full items-center justify-center gap-2.5 rounded-full py-3.5 text-base font-semibold text-white shadow-md transition-opacity hover:opacity-90"
-          style={{ backgroundColor: "#25D366" }}
+          style={{ backgroundColor: PURPLE }}
         >
           <WhatsAppIcon />
           {wa.btn}

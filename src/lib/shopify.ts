@@ -64,8 +64,11 @@ async function shopifyFetch<T>(
   query: string,
   variables?: Record<string, unknown>,
 ): Promise<T> {
-  const domain = process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN;
-  const token  = process.env.NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN;
+  // Strip BOM (U+FEFF) and whitespace — env vars from some editors/CI can include them
+  const BOM = new RegExp(String.fromCharCode(0xFEFF), "g");
+  const sanitize = (v: string) => v.replace(BOM, "").trim();
+  const domain = sanitize(process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN ?? "");
+  const token  = sanitize(process.env.NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN ?? "");
 
   if (!domain || !token) {
     throw new Error(

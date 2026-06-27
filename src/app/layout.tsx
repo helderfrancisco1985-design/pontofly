@@ -1,10 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond } from "next/font/google";
 import { GoogleAnalytics } from "@next/third-parties/google";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import Providers from "@/components/cart/Providers";
 import ServiceWorkerRegister from "@/components/pwa/ServiceWorkerRegister";
 import InstallBanner from "@/components/pwa/InstallBanner";
+import WhatsAppFloat from "@/components/ui/WhatsAppFloat";
 import "./globals.css";
 
 const cormorant = Cormorant_Garamond({
@@ -28,7 +29,8 @@ export const metadata: Metadata = {
     title: "Ponto Fly",
   },
   icons: {
-    apple: "/assets/logo.jpeg",
+    icon: "/assets/hook-transparent.png",
+    apple: "/assets/logo-transparent.png",
   },
 };
 
@@ -36,7 +38,14 @@ export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   const store = await cookies();
-  const locale = store.get("locale")?.value ?? "pt";
+  const supported = ["pt", "en", "es", "fr"];
+  let locale = store.get("locale")?.value;
+  if (!locale) {
+    const reqHeaders = await headers();
+    const acceptLang = reqHeaders.get("accept-language") ?? "";
+    const preferred = acceptLang.split(",")[0].split("-")[0].toLowerCase();
+    locale = supported.includes(preferred) ? preferred : "pt";
+  }
 
   return (
     <html lang={locale} className={`${cormorant.variable} h-full antialiased`}>
@@ -44,6 +53,7 @@ export default async function RootLayout({
         <Providers initialLocale={locale}>
           {children}
           <InstallBanner />
+          <WhatsAppFloat />
         </Providers>
         <ServiceWorkerRegister />
       </body>

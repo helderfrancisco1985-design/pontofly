@@ -32,6 +32,20 @@ export default async function Products() {
             {t.products.title1} <span style={{ color: PURPLE }}>{t.products.title2}</span>
           </h2>
           <div className="mx-auto mt-5 h-px w-16" style={{ backgroundColor: PURPLE }} />
+          <Link
+            href="/produtos"
+            className="mt-6 inline-block rounded-full px-7 py-2.5 text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-90"
+            style={{ backgroundColor: PURPLE }}
+          >
+            {t.products.viewStore}
+          </Link>
+        </div>
+
+        <div className="mb-8 flex items-center justify-center gap-2 rounded-2xl border border-zinc-100 bg-white py-3 text-sm text-zinc-600">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#543286" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
+          </svg>
+          {t.productPage.freeShipping} <strong className="ml-1" style={{ color: PURPLE }}>60 €</strong>
         </div>
 
         {products.length > 0 ? (

@@ -29,74 +29,84 @@ export default function Header() {
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-1">
 
-
-        {/* Nav desktop */}
-        <nav className="hidden items-center gap-8 md:flex">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="text-sm font-medium text-white/80 transition-colors hover:text-white"
-            >
-              {link.label}
-            </Link>
-          ))}
-        </nav>
-
-        {/* CTA + carrinho + idioma desktop */}
-        <div className="hidden items-center gap-3 md:flex">
-          <LanguageSwitcher />
-          <Link
-            href="/produtos"
-            className="rounded-full bg-white px-5 py-2 text-sm font-medium transition-colors hover:bg-white/90"
-            style={{ color: PURPLE }}
-          >
-            {t.nav.viewStore}
-          </Link>
+        {/* Esquerda: hambúrguer mobile + nav desktop */}
+        <div className="flex items-center">
           <button
-            onClick={openCart}
-            aria-label={t.cart.openCart}
-            className="relative flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20"
-          >
-            <ShoppingBag size={20} />
-            {totalQuantity > 0 && (
-              <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-white text-[10px] font-bold" style={{ color: PURPLE }}>
-                {totalQuantity}
-              </span>
-            )}
-          </button>
-          <a
-            href="/app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1.5 rounded-full border border-white/30 px-4 py-2 text-sm font-medium text-white/80 transition-colors hover:border-white/60 hover:text-white"
-          >
-            <Download size={13} />
-            {t.nav.app}
-          </a>
-        </div>
-
-        {/* Carrinho + menu mobile */}
-        <div className="flex items-center gap-2 md:hidden">
-          <button
-            onClick={openCart}
-            aria-label={t.cart.openCart}
-            className="relative flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white"
-          >
-            <ShoppingBag size={18} />
-            {totalQuantity > 0 && (
-              <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-white text-[9px] font-bold" style={{ color: PURPLE }}>
-                {totalQuantity}
-              </span>
-            )}
-          </button>
-          <button
-            className="text-white"
+            className="text-white md:hidden"
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label="Menu"
           >
             {menuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
+          <nav className="hidden items-center gap-8 md:flex">
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="text-sm font-medium text-white/80 transition-colors hover:text-white"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
+
+        {/* Direita: desktop CTA + mobile Ver loja + carrinho */}
+        <div className="flex items-center gap-2">
+          {/* Desktop */}
+          <div className="hidden items-center gap-3 md:flex">
+            <LanguageSwitcher />
+            <Link
+              href="/produtos"
+              className="rounded-full bg-white px-5 py-2 text-sm font-medium transition-colors hover:bg-white/90"
+              style={{ color: PURPLE }}
+            >
+              {t.nav.viewStore}
+            </Link>
+            <button
+              onClick={openCart}
+              aria-label={t.cart.openCart}
+              className="relative flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20"
+            >
+              <ShoppingBag size={20} />
+              {totalQuantity > 0 && (
+                <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-white text-[10px] font-bold" style={{ color: PURPLE }}>
+                  {totalQuantity}
+                </span>
+              )}
+            </button>
+            <a
+              href="/app"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 rounded-full border border-white/30 px-4 py-2 text-sm font-medium text-white/80 transition-colors hover:border-white/60 hover:text-white"
+            >
+              <Download size={13} />
+              {t.nav.app}
+            </a>
+          </div>
+          {/* Mobile */}
+          <div className="flex items-center gap-2 md:hidden">
+            <Link
+              href="/produtos"
+              className="rounded-full px-4 py-1.5 text-xs font-semibold text-white"
+              style={{ backgroundColor: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.3)" }}
+            >
+              {t.nav.viewStore}
+            </Link>
+            <button
+              onClick={openCart}
+              aria-label={t.cart.openCart}
+              className="relative flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white"
+            >
+              <ShoppingBag size={18} />
+              {totalQuantity > 0 && (
+                <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-white text-[9px] font-bold" style={{ color: PURPLE }}>
+                  {totalQuantity}
+                </span>
+              )}
+            </button>
+          </div>
         </div>
       </div>
 

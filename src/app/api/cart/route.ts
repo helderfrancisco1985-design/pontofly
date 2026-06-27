@@ -9,8 +9,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Carrinho vazio." }, { status: 400 });
   }
 
-  const domain = process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN;
-  const token  = process.env.NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN;
+  const BOM = new RegExp(String.fromCharCode(0xFEFF), "g");
+  const sanitize = (v: string) => v.replace(BOM, "").trim();
+  const domain = sanitize(process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN ?? "");
+  const token  = sanitize(process.env.NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN ?? "");
 
   if (!domain || !token) {
     return NextResponse.json({ error: "Shopify não configurado." }, { status: 503 });
