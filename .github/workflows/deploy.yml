@@ -32,13 +32,31 @@ jobs:
       - name: Assemble deploy folder
         run: |
           mkdir -p deploy
-          cp -r .next     deploy/
-          cp -r public    deploy/
+          cp -r .next          deploy/
+          cp -r public         deploy/
           cp package.json      deploy/
           cp package-lock.json deploy/
-          cp server.js         deploy/
           [ -f next.config.ts ] && cp next.config.ts deploy/
           [ -f next.config.js ] && cp next.config.js deploy/
+
+          # server.js is in .gitignore (not needed for Vercel) — generate for Passenger/cPanel
+          cat > deploy/server.js << 'SERVERJS'
+const { createServer } = require("http");
+const { parse } = require("url");
+const next = require("next");
+
+const port = parseInt(process.env.PORT || "3000", 10);
+const app = next({ dev: false, dir: __dirname });
+const handle = app.getRequestHandler();
+
+app.prepare().then(() => {
+  createServer((req, res) => {
+    handle(req, res, parse(req.url, true));
+  }).listen(port, () => {
+    console.log("> Ready on port " + port);
+  });
+});
+SERVERJS
 
       - name: Deploy via FTPS
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
