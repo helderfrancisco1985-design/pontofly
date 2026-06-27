@@ -74,6 +74,6 @@ jobs:
           set net:reconnect-interval-base 5
           set net:timeout 120
           set ftp:nop-interval 60
-          mirror --reverse --verbose --no-perms ./deploy/ /pontofly/
+          mirror --reverse --verbose --no-perms ./deploy/ /
           bye
           LFTP
