@@ -1,36 +1,61 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Ponto Fly
 
-## Getting Started
+Loja online de fios e acessórios para tricot e croché, construída em Next.js e alojada no cPanel via Passenger.
 
-First, run the development server:
+## Desenvolvimento local
 
 ```bash
+cp .env.example .env.local   # preencher com os valores reais
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abrir [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Variáveis de ambiente
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Build-time — GitHub Secrets
 
-## Learn More
+Estas variáveis são `NEXT_PUBLIC_*` e ficam **gravadas no bundle** durante `npm run build`. Têm de estar configuradas como GitHub Secrets antes de cada deploy.
 
-To learn more about Next.js, take a look at the following resources:
+| Secret | Descrição |
+|---|---|
+| `NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN` | Domínio da loja Shopify (ex: `minha-loja.myshopify.com`) |
+| `NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN` | Storefront API token (token público, só leitura + carrinho) |
+| `NEXT_PUBLIC_SITE_URL` | URL pública do site (ex: `https://pontofly.pt`) |
+| `NEXT_PUBLIC_GA_MEASUREMENT_ID` | ID do Google Analytics 4 (ex: `G-XXXXXXXXXX`), opcional |
+| `CPANEL_FTP_HOST` | Hostname FTP do cPanel |
+| `CPANEL_FTP_USER` | Utilizador FTP |
+| `CPANEL_FTP_PASSWORD` | Password FTP |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Onde configurar: **GitHub → Settings → Secrets and variables → Actions → New repository secret**
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Runtime — cPanel Environment Variables
 
-## Deploy on Vercel
+Estas variáveis são lidas em runtime pelo servidor Node.js. Nunca entram no bundle do cliente. Têm de ser configuradas diretamente no cPanel.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Variável | Descrição |
+|---|---|
+| `RESEND_API_KEY` | Chave da API Resend para envio de emails |
+| `CONTACT_EMAIL` | Email de destino do formulário de contacto |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Onde configurar: **cPanel → Node.js App → Edit → Environment Variables**
+
+> As variáveis `NEXT_PUBLIC_*` NÃO precisam de estar no cPanel — ficam gravadas no bundle durante o build no GitHub Actions.
+
+## Deploy
+
+O deploy é automático em cada push para `master` via GitHub Actions (`.github/workflows/deploy.yml`):
+
+1. `npm ci` — instalar dependências
+2. `npm run build` — compilar com todas as `NEXT_PUBLIC_*` vars injetadas
+3. Upload via FTPS para o cPanel
+4. Reiniciar a app no cPanel (Restart App)
+
+## Arquitetura
+
+- **Framework**: Next.js (App Router)
+- **Servidor**: Passenger (Node.js 22) no cPanel
+- **Loja**: Shopify Storefront API
+- **Email**: Resend
+- **CSS**: Tailwind CSS

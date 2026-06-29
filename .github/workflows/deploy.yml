@@ -22,12 +22,15 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # NEXT_PUBLIC_* vars are baked into the client bundle at build time
+      # NEXT_PUBLIC_* vars are baked into every bundle (client + server) at build time.
+      # They must all be present here; they cannot be changed after the build.
       - name: Build
         run: npm run build
         env:
           NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN: ${{ secrets.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN }}
           NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN: ${{ secrets.NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN }}
+          NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
+          NEXT_PUBLIC_GA_MEASUREMENT_ID: ${{ secrets.NEXT_PUBLIC_GA_MEASUREMENT_ID }}
 
       - name: Assemble deploy folder
         run: |
@@ -41,22 +44,22 @@ jobs:
 
           # server.js is in .gitignore (not needed for Vercel) — generate for Passenger/cPanel
           cat > deploy/server.js << 'SERVERJS'
-          const { createServer } = require("http");
-          const { parse } = require("url");
-          const next = require("next");
+const { createServer } = require("http");
+const { parse } = require("url");
+const next = require("next");
 
-          const port = parseInt(process.env.PORT || "3000", 10);
-          const app = next({ dev: false, dir: __dirname });
-          const handle = app.getRequestHandler();
+const port = parseInt(process.env.PORT || "3000", 10);
+const app = next({ dev: false, dir: __dirname });
+const handle = app.getRequestHandler();
 
-          app.prepare().then(() => {
-            createServer((req, res) => {
-              handle(req, res, parse(req.url, true));
-            }).listen(port, () => {
-              console.log("> Ready on port " + port);
-            });
-          });
-          SERVERJS
+app.prepare().then(() => {
+  createServer((req, res) => {
+    handle(req, res, parse(req.url, true));
+  }).listen(port, () => {
+    console.log("> Ready on port " + port);
+  });
+});
+SERVERJS
 
       - name: Deploy via FTP (lftp)
         env:
