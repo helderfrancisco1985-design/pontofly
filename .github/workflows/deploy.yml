@@ -44,22 +44,22 @@ jobs:
 
           # server.js is in .gitignore (not needed for Vercel) — generate for Passenger/cPanel
           cat > deploy/server.js << 'SERVERJS'
-const { createServer } = require("http");
-const { parse } = require("url");
-const next = require("next");
+          const { createServer } = require("http");
+          const { parse } = require("url");
+          const next = require("next");
 
-const port = parseInt(process.env.PORT || "3000", 10);
-const app = next({ dev: false, dir: __dirname });
-const handle = app.getRequestHandler();
+          const port = parseInt(process.env.PORT || "3000", 10);
+          const app = next({ dev: false, dir: __dirname });
+          const handle = app.getRequestHandler();
 
-app.prepare().then(() => {
-  createServer((req, res) => {
-    handle(req, res, parse(req.url, true));
-  }).listen(port, () => {
-    console.log("> Ready on port " + port);
-  });
-});
-SERVERJS
+          app.prepare().then(() => {
+            createServer((req, res) => {
+              handle(req, res, parse(req.url, true));
+            }).listen(port, () => {
+              console.log("> Ready on port " + port);
+            });
+          });
+          SERVERJS
 
       - name: Deploy via FTP (lftp)
         env:
